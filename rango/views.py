@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
-from rango.models import Category
+from rango.models import Category, Page
 
 def index(request) :
     # Sorts the categories by likes in descending order('-' before likes)
@@ -16,4 +16,17 @@ def index(request) :
 
 def about(request) :
     return render(request, 'rango/about.html')
+
+def show_category(request, category_name_slug):
+    context_dic = {}
+    try:
+        category = Category.objects.get(slug=category_name_slug)
+        pages = Page.objects.filter(category=category)
+        context_dic['pages'] = pages
+        context_dic['category'] = category
+    except Category.DoesNotExist:
+        context_dic['category'] = None
+        context_dic['pages'] = None
+
+    return render(request, 'rango/category.html', context=context_dic)
 
